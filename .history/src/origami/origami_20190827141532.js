@@ -29,7 +29,7 @@ const { __ } = wp.i18n;
 const { registerBlockType, query } = wp.blocks;
 
 registerBlockType('origami/notebox', {
-    title: __('Origami Notebox', 'origami'),
+    title: __('Origami Notebox'),
     icon: 'format-aside',
     category: 'common',
     keywords: [__('notebox'), __('Notebox'), __('origami')],
@@ -47,21 +47,21 @@ registerBlockType('origami/notebox', {
         return (
             <div className={className}>
                 <TextControl
-                    label={__('Origami Notebox块', 'origami')}
+                    label="Origami Notebox块"
                     value={attributes.content}
                     onChange={val => {
                         setAttributes({ content: val });
                     }}
                 />
                 <SelectControl
-                    label={__('选择样式', 'origami')}
+                    label="选择样式"
                     value={attributes.color_select}
                     options={[
-                        { label: __('请设置颜色', 'origami'), value: null },
-                        { label: __('blue', 'origami'), value: 'blue' },
-                        { label: __('green', 'origami'), value: 'green' },
-                        { label: __('yellow', 'origami'), value: 'yellow' },
-                        { label: __('red', 'origami'), value: 'red' }
+                        { label: '请设置颜色', value: null },
+                        { label: 'blue', value: 'blue' },
+                        { label: 'green', value: 'green' },
+                        { label: 'yellow', value: 'yellow' },
+                        { label: 'red', value: 'red' }
                     ]}
                     onChange={val => {
                         setAttributes({ color_select: val });
@@ -83,7 +83,7 @@ registerBlockType('origami/notebox', {
 });
 
 registerBlockType('origami/prism', {
-    title: __('Origami代码', 'origami'),
+    title: __('Origami代码'),
     icon: 'editor-code',
     category: 'common',
     keywords: [__('code'), __('prism'), __('origami')],
@@ -149,6 +149,27 @@ registerBlockType('origami/prism', {
                 }
             }, 50);
         }
+        // const langEle = wp.element.createElement(wp.components.SelectControl, {
+        //     label: '代码语言',
+        //     value: attributes.lang,
+        //     options: langList,
+        //     onChange: val => {
+        //         setAttributes({ lang: val });
+        //         window.origami[attributes.hash].ace.session.setMode(
+        //             'ace/mode/' + val
+        //         );
+        //     }
+        // });
+        const showMenuEle = wp.element.createElement(
+            wp.components.Button,
+            {
+                isDefault: true,
+                onClick: () => {
+                    item.showSettingMenu();
+                }
+            },
+            '编辑器菜单'
+        );
         return (
             <div className={className}>
                 <div
@@ -156,7 +177,7 @@ registerBlockType('origami/prism', {
                     id={'ace-editor-' + attributes.hash}
                 />
                 <SelectControl
-                    label={__('代码语言', 'origami')}
+                    label="代码语言"
                     value={attributes.lang}
                     options={langList}
                     onChange={val => {
@@ -172,7 +193,7 @@ registerBlockType('origami/prism', {
                         item.showSettingMenu();
                     }}
                 >
-                    {__('编辑器菜单', 'origami')}
+                    编辑器菜单
                 </Button>
             </div>
         );
@@ -191,7 +212,7 @@ registerBlockType('origami/prism', {
 });
 
 registerBlockType('origami/image', {
-    title: __('Origami图片', 'origami'),
+    title: __('Origami图片'),
     icon: 'format-image',
     category: 'common',
     keywords: [__('image'), __('thum'), __('origami')],
@@ -207,33 +228,54 @@ registerBlockType('origami/image', {
         }
     },
     edit: ({ attributes, setAttributes, className }) => {
+        // const isThumEle = wp.element.createElement(
+        //     wp.components.CheckboxControl,
+        //     {
+        //         label: __('是否设置为特色图片'),
+        //         checked: attributes.isThum,
+        //         onChange: val => {
+        //             setAttributes({ isThum: val });
+        //         }
+        //     }
+        // );
+        const isShowEle = wp.element.createElement(
+            wp.components.CheckboxControl,
+            {
+                label: __('是否设置为显示'),
+                checked: attributes.isShow,
+                onChange: val => {
+                    setAttributes({ isShow: val });
+                }
+            }
+        );
+        const urlEle = wp.element.createElement(wp.components.TextControl, {
+            label: __('图片URL'),
+            value: attributes.url,
+            onChange: val => {
+                setAttributes({ url: val });
+            }
+        });
         return (
             <div className={className}>
                 <CheckboxControl
-                    label={__('是否设置为特色图片', 'origami')}
+                    label={__('是否设置为特色图片')}
                     checked={attributes.isThum}
                     onChange={val => {
                         setAttributes({ isThum: val });
                     }}
                 />
                 <CheckboxControl
-                    label={__('是否设置为显示', 'origami')}
+                    label={__('是否设置为显示')}
                     checked={attributes.isShow}
                     onChange={val => {
                         setAttributes({ isShow: val });
                     }}
                 />
-                <TextControl
-                    label={__('图片URL', 'origami')}
-                    value={attributes.url}
-                    onChange={val => {
-                        setAttributes({ url: val });
-                    }}
-                />
+                {urlEle}
             </div>
         );
     },
-    save: ({ attributes, className }) => {
+    save: function({ attributes, className }) {
         const styleStr = attributes.isShow ? '' : 'display:none';
         return (
             <img
@@ -248,7 +290,7 @@ registerBlockType('origami/image', {
 });
 
 registerBlockType('origami/markdown', {
-    title: __('Origami Markdown', 'origami'),
+    title: __('Origami Markdown'),
     icon: 'format-aside',
     category: 'common',
     keywords: [__('markdown'), __('editor'), __('origami')],
@@ -263,9 +305,9 @@ registerBlockType('origami/markdown', {
             type: 'string'
         }
     },
-    edit: ({ attributes, className, setAttributes }) => {
-        if (!attributes.hash || attributes.hash === '') {
-            setAttributes({
+    edit: function(props) {
+        if (!props.attributes.hash || props.attributes.hash === '') {
+            props.setAttributes({
                 hash: Math.random()
                     .toString(36)
                     .substring(2, 8)
@@ -279,10 +321,10 @@ registerBlockType('origami/markdown', {
             );
         }
         let item = {};
-        if (window.origami[attributes.hash]) {
-            item = window.origami[attributes.hash];
+        if (window.origami[props.attributes.hash]) {
+            item = window.origami[props.attributes.hash];
         } else {
-            window.origami[attributes.hash] = item;
+            window.origami[props.attributes.hash] = item;
             item.setting = {
                 minLines: 10,
                 fontSize: 17,
@@ -298,19 +340,23 @@ registerBlockType('origami/markdown', {
                 item.ace.commands.commands.showSettingsMenu.exec(item.ace);
             };
             let timer = setInterval(() => {
-                if (document.getElementById('ace-editor-' + attributes.hash)) {
+                if (
+                    document.getElementById(
+                        'ace-editor-' + props.attributes.hash
+                    )
+                ) {
                     clearInterval(timer);
                     item.ace = window.ace.edit(
-                        'ace-editor-' + attributes.hash,
+                        'ace-editor-' + props.attributes.hash,
                         item.setting
                     );
-                    if (attributes.content) {
-                        item.ace.setValue(attributes.content);
+                    if (props.attributes.content) {
+                        item.ace.setValue(props.attributes.content);
                     }
                     item.ace.gotoLine(1);
                     item.ace.session.on('change', () => {
                         let val = item.ace.getValue();
-                        setAttributes({
+                        props.setAttributes({
                             content: val,
                             htmlContent: toHtml(val, false)
                         });
@@ -318,97 +364,103 @@ registerBlockType('origami/markdown', {
                 }
             }, 50);
         }
+        const showMenuBtn = wp.element.createElement(
+            wp.components.Button,
+            {
+                isDefault: true,
+                onClick: () => {
+                    item.showSettingMenu();
+                }
+            },
+            '编辑器菜单'
+        );
         let preview = false;
+        const showPreviewBtn = wp.element.createElement(
+            wp.components.Button,
+            {
+                isDefault: true,
+                onClick: () => {
+                    if (!preview) {
+                        document.querySelector(
+                            '#markdown-preview-' + props.attributes.hash
+                        ).style.display = 'block';
+                        document.querySelector(
+                            '#ace-editor-' + props.attributes.hash
+                        ).style.display = 'none';
+                        window.Prism.highlightAll();
+                        window.renderMathInElement(
+                            document.querySelector(
+                                '#markdown-preview-' + props.attributes.hash
+                            ),
+                            {
+                                delimiters: [
+                                    {
+                                        left: '$$',
+                                        right: '$$'
+                                    },
+                                    {
+                                        left: '```math',
+                                        right: '```'
+                                    },
+                                    {
+                                        left: '```tex',
+                                        right: '```'
+                                    }
+                                ],
+                                ignoredTags: [
+                                    'script',
+                                    'noscript',
+                                    'style',
+                                    'textarea',
+                                    'code'
+                                ]
+                            }
+                        );
+                        try {
+                            window.mermaid.init(
+                                { noteMargin: 10 },
+                                '.xkeditor-mermaid'
+                            );
+                        } catch (error) {
+                            console.log('May have errors');
+                        }
+                    } else {
+                        document.querySelector(
+                            '#markdown-preview-' + props.attributes.hash
+                        ).style.display = 'none';
+                        document.querySelector(
+                            '#ace-editor-' + props.attributes.hash
+                        ).style.display = 'block';
+                    }
+                    preview = !preview;
+                }
+            },
+            '预览/编辑'
+        );
         return (
-            <div className={className}>
+            <div className={props.className}>
                 <div
                     className="ace-editor"
-                    id={'ace-editor-' + attributes.hash}
+                    id={'ace-editor-' + props.attributes.hash}
                 />
                 <div
                     className="markdown-preview"
-                    id={'markdown-preview-' + attributes.hash}
+                    id={'markdown-preview-' + props.attributes.hash}
                     dangerouslySetInnerHTML={{
-                        __html: attributes.htmlContent
+                        __html: props.attributes.htmlContent
                     }}
                 />
-                <Button
-                    isDefault={true}
-                    onClick={() => {
-                        item.showSettingMenu();
-                    }}
-                >
-                    {__('编辑器菜单', 'origami')}
-                </Button>
-                <Button
-                    isDefault={true}
-                    onClick={() => {
-                        if (!preview) {
-                            document.querySelector(
-                                '#markdown-preview-' + attributes.hash
-                            ).style.display = 'block';
-                            document.querySelector(
-                                '#ace-editor-' + attributes.hash
-                            ).style.display = 'none';
-                            window.Prism.highlightAll();
-                            window.renderMathInElement(
-                                document.querySelector(
-                                    '#markdown-preview-' + attributes.hash
-                                ),
-                                {
-                                    delimiters: [
-                                        {
-                                            left: '$$',
-                                            right: '$$'
-                                        },
-                                        {
-                                            left: '```math',
-                                            right: '```'
-                                        },
-                                        {
-                                            left: '```tex',
-                                            right: '```'
-                                        }
-                                    ],
-                                    ignoredTags: [
-                                        'script',
-                                        'noscript',
-                                        'style',
-                                        'textarea',
-                                        'code'
-                                    ]
-                                }
-                            );
-                            try {
-                                window.mermaid.init(
-                                    { noteMargin: 10 },
-                                    '.xkeditor-mermaid'
-                                );
-                            } catch (error) {
-                                console.log('May have errors');
-                            }
-                        } else {
-                            document.querySelector(
-                                '#markdown-preview-' + attributes.hash
-                            ).style.display = 'none';
-                            document.querySelector(
-                                '#ace-editor-' + attributes.hash
-                            ).style.display = 'block';
-                        }
-                        preview = !preview;
-                    }}
-                >
-                    {__('预览/编辑', 'origami')}
-                </Button>
+                {showMenuBtn}
+                {showPreviewBtn}
             </div>
         );
     },
-    save: ({ className, attributes }) => {
+    save: function(props) {
         return (
             <div
-                className={'markdown-body ' + className}
+                className={'markdown-body ' + props.className}
                 dangerouslySetInnerHTML={{
-                    __html: attributes.htmlContent
+                    __html: props.attributes.htmlContent
                 }}
             />
         );

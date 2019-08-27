@@ -319,6 +319,68 @@ registerBlockType('origami/markdown', {
             }, 50);
         }
         let preview = false;
+        const showPreviewBtn = wp.element.createElement(
+            wp.components.Button,
+            {
+                isDefault: true,
+                onClick: () => {
+                    if (!preview) {
+                        document.querySelector(
+                            '#markdown-preview-' + attributes.hash
+                        ).style.display = 'block';
+                        document.querySelector(
+                            '#ace-editor-' + attributes.hash
+                        ).style.display = 'none';
+                        window.Prism.highlightAll();
+                        window.renderMathInElement(
+                            document.querySelector(
+                                '#markdown-preview-' + attributes.hash
+                            ),
+                            {
+                                delimiters: [
+                                    {
+                                        left: '$$',
+                                        right: '$$'
+                                    },
+                                    {
+                                        left: '```math',
+                                        right: '```'
+                                    },
+                                    {
+                                        left: '```tex',
+                                        right: '```'
+                                    }
+                                ],
+                                ignoredTags: [
+                                    'script',
+                                    'noscript',
+                                    'style',
+                                    'textarea',
+                                    'code'
+                                ]
+                            }
+                        );
+                        try {
+                            window.mermaid.init(
+                                { noteMargin: 10 },
+                                '.xkeditor-mermaid'
+                            );
+                        } catch (error) {
+                            console.log('May have errors');
+                        }
+                    } else {
+                        document.querySelector(
+                            '#markdown-preview-' + attributes.hash
+                        ).style.display = 'none';
+                        document.querySelector(
+                            '#ace-editor-' + attributes.hash
+                        ).style.display = 'block';
+                    }
+                    preview = !preview;
+                }
+            },
+            '预览/编辑'
+        );
         return (
             <div className={className}>
                 <div
@@ -340,66 +402,7 @@ registerBlockType('origami/markdown', {
                 >
                     {__('编辑器菜单', 'origami')}
                 </Button>
-                <Button
-                    isDefault={true}
-                    onClick={() => {
-                        if (!preview) {
-                            document.querySelector(
-                                '#markdown-preview-' + attributes.hash
-                            ).style.display = 'block';
-                            document.querySelector(
-                                '#ace-editor-' + attributes.hash
-                            ).style.display = 'none';
-                            window.Prism.highlightAll();
-                            window.renderMathInElement(
-                                document.querySelector(
-                                    '#markdown-preview-' + attributes.hash
-                                ),
-                                {
-                                    delimiters: [
-                                        {
-                                            left: '$$',
-                                            right: '$$'
-                                        },
-                                        {
-                                            left: '```math',
-                                            right: '```'
-                                        },
-                                        {
-                                            left: '```tex',
-                                            right: '```'
-                                        }
-                                    ],
-                                    ignoredTags: [
-                                        'script',
-                                        'noscript',
-                                        'style',
-                                        'textarea',
-                                        'code'
-                                    ]
-                                }
-                            );
-                            try {
-                                window.mermaid.init(
-                                    { noteMargin: 10 },
-                                    '.xkeditor-mermaid'
-                                );
-                            } catch (error) {
-                                console.log('May have errors');
-                            }
-                        } else {
-                            document.querySelector(
-                                '#markdown-preview-' + attributes.hash
-                            ).style.display = 'none';
-                            document.querySelector(
-                                '#ace-editor-' + attributes.hash
-                            ).style.display = 'block';
-                        }
-                        preview = !preview;
-                    }}
-                >
-                    {__('预览/编辑', 'origami')}
-                </Button>
+                {showPreviewBtn}
             </div>
         );
     },

@@ -41,7 +41,7 @@ add_action( 'enqueue_block_assets', 'my_custom_block_cgb_block_assets' );
  * @uses {wp-editor} for WP editor styles.
  * @since 1.0.0
  */
-function origami_editor_assets() { // phpcs:ignore
+function my_custom_block_cgb_editor_assets() { // phpcs:ignore
 	// Scripts.
 	wp_enqueue_script(
 		'origami-block-js', // Handle.
@@ -61,4 +61,4 @@ function origami_editor_assets() { // phpcs:ignore
 }
 
 // Hook: Editor assets.
-add_action( 'enqueue_block_editor_assets', 'origami_editor_assets' );
+add_action( 'enqueue_block_editor_assets', 'my_custom_block_cgb_editor_assets' );
