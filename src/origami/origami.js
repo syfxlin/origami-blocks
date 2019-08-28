@@ -96,6 +96,9 @@ registerBlockType('origami/prism', {
         },
         hash: {
             type: 'string'
+        },
+        height: {
+            type: 'string'
         }
     },
     edit: ({ attributes, setAttributes, className }) => {
@@ -114,6 +117,23 @@ registerBlockType('origami/prism', {
             );
         }
         let item = {};
+        let setHeight = val => {
+            if (parseInt(val) > 100) {
+                val = '100';
+            }
+            if (parseInt(val) <= 0) {
+                val = '1';
+            }
+            if (window.origami[attributes.hash].resizeTimer) {
+                clearTimeout(window.origami[attributes.hash].resizeTimer);
+            }
+            window.origami[attributes.hash].resizeTimer = setTimeout(() => {
+                document.getElementById(
+                    'ace-editor-' + attributes.hash
+                ).style.height = val + 'vh';
+                window.origami[attributes.hash].ace.resize();
+            }, 1000);
+        };
         if (window.origami[attributes.hash]) {
             item = window.origami[attributes.hash];
         } else {
@@ -132,9 +152,9 @@ registerBlockType('origami/prism', {
             item.showSettingMenu = () => {
                 item.ace.commands.commands.showSettingsMenu.exec(item.ace);
             };
-            let timer = setInterval(() => {
+            let timer1 = setInterval(() => {
                 if (document.getElementById('ace-editor-' + attributes.hash)) {
-                    clearInterval(timer);
+                    clearInterval(timer1);
                     item.ace = window.ace.edit(
                         'ace-editor-' + attributes.hash,
                         item.setting
@@ -143,11 +163,13 @@ registerBlockType('origami/prism', {
                         item.ace.setValue(attributes.content);
                     }
                     item.ace.gotoLine(1);
+                    setHeight(attributes.height);
                     item.ace.session.on('change', () => {
                         setAttributes({ content: item.ace.getValue() });
                     });
                 }
             }, 50);
+            item.resizeTimer = null;
         }
         return (
             <div className={className}>
@@ -174,6 +196,44 @@ registerBlockType('origami/prism', {
                 >
                     {__('编辑器菜单', 'origami')}
                 </Button>
+                <TextControl
+                    label={__('编辑器高度(延迟一秒生效[1-100])', 'origami')}
+                    value={attributes.height}
+                    placeholder="30"
+                    onChange={val => {
+                        if (parseInt(val) > 100) {
+                            val = '100';
+                        }
+                        if (parseInt(val) <= 0) {
+                            val = '1';
+                        }
+                        setHeight(val);
+                        setAttributes({ height: val });
+                    }}
+                    onKeyDown={e => {
+                        if (e.key === 'ArrowDown') {
+                            let val = parseInt(attributes.height) - 1;
+                            if (val <= 0) {
+                                val = '1';
+                            }
+                            setAttributes({
+                                height: val + ''
+                            });
+                            setHeight(attributes.height);
+                            e.preventDefault();
+                        } else if (e.key === 'ArrowUp') {
+                            let val = parseInt(attributes.height) + 1;
+                            if (val > 100) {
+                                val = '100';
+                            }
+                            setAttributes({
+                                height: val
+                            });
+                            setHeight(attributes.height);
+                            e.preventDefault();
+                        }
+                    }}
+                />
             </div>
         );
     },
@@ -261,6 +321,9 @@ registerBlockType('origami/markdown', {
         },
         hash: {
             type: 'string'
+        },
+        height: {
+            type: 'string'
         }
     },
     edit: ({ attributes, className, setAttributes }) => {
@@ -279,6 +342,23 @@ registerBlockType('origami/markdown', {
             );
         }
         let item = {};
+        let setHeight = val => {
+            if (parseInt(val) > 100) {
+                val = '100';
+            }
+            if (parseInt(val) <= 0) {
+                val = '1';
+            }
+            if (window.origami[attributes.hash].resizeTimer) {
+                clearTimeout(window.origami[attributes.hash].resizeTimer);
+            }
+            window.origami[attributes.hash].resizeTimer = setTimeout(() => {
+                document.getElementById(
+                    'ace-editor-' + attributes.hash
+                ).style.height = val + 'vh';
+                window.origami[attributes.hash].ace.resize();
+            }, 1000);
+        };
         if (window.origami[attributes.hash]) {
             item = window.origami[attributes.hash];
         } else {
@@ -308,6 +388,7 @@ registerBlockType('origami/markdown', {
                         item.ace.setValue(attributes.content);
                     }
                     item.ace.gotoLine(1);
+                    setHeight(attributes.height);
                     item.ace.session.on('change', () => {
                         let val = item.ace.getValue();
                         setAttributes({
@@ -317,6 +398,7 @@ registerBlockType('origami/markdown', {
                     });
                 }
             }, 50);
+            item.resizeTimer = null;
         }
         let preview = false;
         return (
@@ -400,6 +482,44 @@ registerBlockType('origami/markdown', {
                 >
                     {__('预览/编辑', 'origami')}
                 </Button>
+                <TextControl
+                    label={__('编辑器高度(延迟一秒生效[1-100])', 'origami')}
+                    value={attributes.height}
+                    placeholder="30"
+                    onChange={val => {
+                        if (parseInt(val) > 100) {
+                            val = '100';
+                        }
+                        if (parseInt(val) <= 0) {
+                            val = '1';
+                        }
+                        setHeight(val);
+                        setAttributes({ height: val });
+                    }}
+                    onKeyDown={e => {
+                        if (e.key === 'ArrowDown') {
+                            let val = parseInt(attributes.height) - 1;
+                            if (val <= 0) {
+                                val = '1';
+                            }
+                            setAttributes({
+                                height: val + ''
+                            });
+                            setHeight(attributes.height);
+                            e.preventDefault();
+                        } else if (e.key === 'ArrowUp') {
+                            let val = parseInt(attributes.height) + 1;
+                            if (val > 100) {
+                                val = '100';
+                            }
+                            setAttributes({
+                                height: val
+                            });
+                            setHeight(attributes.height);
+                            e.preventDefault();
+                        }
+                    }}
+                />
             </div>
         );
     },
@@ -411,6 +531,65 @@ registerBlockType('origami/markdown', {
                     __html: attributes.htmlContent
                 }}
             />
+        );
+    }
+});
+
+registerBlockType('origami/gitcard', {
+    title: __('Origami Git卡片', 'origami'),
+    icon: 'networking',
+    category: 'common',
+    keywords: [__('git'), __('card'), __('origami')],
+    attributes: {
+        repo: {
+            type: 'string'
+        },
+        platform: {
+            type: 'string'
+        }
+    },
+    edit: ({ attributes, setAttributes, className }) => {
+        return (
+            <div className={className}>
+                <TextControl
+                    label={__('Git仓库名, ex:(syfxlin/origami)', 'origami')}
+                    value={attributes.repo}
+                    onChange={val => {
+                        setAttributes({ repo: val });
+                    }}
+                />
+                <SelectControl
+                    label={__('选择平台', 'origami')}
+                    value={attributes.platform}
+                    options={[
+                        { label: __('请选择平台', 'origami'), value: null },
+                        { label: __('GitHub', 'origami'), value: 'github' },
+                        { label: __('GitLab', 'origami'), value: 'gitlab' },
+                        { label: __('Gitea', 'origami'), value: 'gitea' },
+                        { label: __('Coding', 'origami'), value: 'coding' },
+                        { label: __('Gitee', 'origami'), value: 'gitee' }
+                    ]}
+                    onChange={val => {
+                        setAttributes({ platform: val });
+                    }}
+                />
+            </div>
+        );
+    },
+    save: ({ attributes, className }) => {
+        return (
+            <div
+                className={className + ' gitcard'}
+                data-repo={attributes.repo}
+                data-platform={attributes.platform}
+            >
+                <div className="gitcard-head"></div>
+                <div className="gitcard-body loading"></div>
+                <div className="gitcard-footer">
+                    <div className="gitcard-star"></div>
+                    <div className="gitcard-to"></div>
+                </div>
+            </div>
         );
     }
 });

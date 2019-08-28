@@ -16,11 +16,22 @@
 
 .ace-editor,
 #ace-editor {
-    height: 60vh;
+    height: 30vh;
 }
 
 #ace_settingsmenu {
     margin-top: 2rem;
+}
+
+.drag {
+    height: 1em;
+    background: rgb(142, 209, 252);
+    text-align: center;
+    cursor: n-resize;
+}
+
+.drag span {
+    font-size: 1em;
 }
 
 .markdown-preview {
