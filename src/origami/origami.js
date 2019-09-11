@@ -1,3 +1,4 @@
+/* eslint-disable operator-linebreak */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-else-return */
@@ -142,7 +143,13 @@ registerBlockType('origami/prism', {
                 minLines: 10,
                 fontSize: 17,
                 theme: 'ace/theme/solarized_light',
-                mode: 'ace/mode/' + attributes.lang,
+                mode:
+                    'ace/mode/' +
+                    langList.find(
+                        o =>
+                            o.ace === attributes.lang ||
+                            o.prism === attributes.lang
+                    ).ace,
                 tabSize: 4,
                 wrap: true,
                 enableSnippets: true,
@@ -179,12 +186,23 @@ registerBlockType('origami/prism', {
                 />
                 <SelectControl
                     label={__('代码语言', 'origami')}
-                    value={attributes.lang}
+                    value={
+                        langList.find(
+                            o =>
+                                o.ace === attributes.lang ||
+                                o.prism === attributes.lang
+                        ).value
+                    }
                     options={langList}
                     onChange={val => {
-                        setAttributes({ lang: val });
+                        setAttributes({
+                            lang:
+                                langList[val].prism === null
+                                    ? langList[val].ace
+                                    : langList[val].prism
+                        });
                         window.origami[attributes.hash].ace.session.setMode(
-                            'ace/mode/' + val
+                            'ace/mode/' + langList[val].ace
                         );
                     }}
                 />
