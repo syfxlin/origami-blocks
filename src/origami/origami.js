@@ -139,17 +139,15 @@ registerBlockType('origami/prism', {
             item = window.origami[attributes.hash];
         } else {
             window.origami[attributes.hash] = item;
+            let listItem = langList.find(
+                o => o.ace === attributes.lang || o.prism === attributes.lang
+            );
+            let lang = listItem ? listItem.value : 'clike';
             item.setting = {
                 minLines: 10,
                 fontSize: 17,
                 theme: 'ace/theme/solarized_light',
-                mode:
-                    'ace/mode/' +
-                    langList.find(
-                        o =>
-                            o.ace === attributes.lang ||
-                            o.prism === attributes.lang
-                    ).ace,
+                mode: 'ace/mode/' + lang,
                 tabSize: 4,
                 wrap: true,
                 enableSnippets: true,
@@ -191,7 +189,13 @@ registerBlockType('origami/prism', {
                             o =>
                                 o.ace === attributes.lang ||
                                 o.prism === attributes.lang
-                        ).value
+                        )
+                            ? langList.find(
+                                  o =>
+                                      o.ace === attributes.lang ||
+                                      o.prism === attributes.lang
+                              ).value
+                            : 'clike'
                     }
                     options={langList}
                     onChange={val => {
