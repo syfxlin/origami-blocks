@@ -137,6 +137,28 @@ registerBlockType('origami/prism', {
         };
         if (window.origami[attributes.hash]) {
             item = window.origami[attributes.hash];
+            let timer1 = setInterval(() => {
+                if (document.getElementById('ace-editor-' + attributes.hash)) {
+                    clearInterval(timer1);
+                    if (
+                        document.getElementById('ace-editor-' + attributes.hash)
+                            .innerHTML === ''
+                    ) {
+                        item.ace = window.ace.edit(
+                            'ace-editor-' + attributes.hash,
+                            item.setting
+                        );
+                        if (attributes.content) {
+                            item.ace.setValue(attributes.content);
+                        }
+                        item.ace.gotoLine(1);
+                        setHeight(attributes.height);
+                        item.ace.session.on('change', () => {
+                            setAttributes({ content: item.ace.getValue() });
+                        });
+                    }
+                }
+            }, 50);
         } else {
             window.origami[attributes.hash] = item;
             let listItem = langList.find(
@@ -383,6 +405,28 @@ registerBlockType('origami/markdown', {
         };
         if (window.origami[attributes.hash]) {
             item = window.origami[attributes.hash];
+            let timer1 = setInterval(() => {
+                if (document.getElementById('ace-editor-' + attributes.hash)) {
+                    clearInterval(timer1);
+                    if (
+                        document.getElementById('ace-editor-' + attributes.hash)
+                            .innerHTML === ''
+                    ) {
+                        item.ace = window.ace.edit(
+                            'ace-editor-' + attributes.hash,
+                            item.setting
+                        );
+                        if (attributes.content) {
+                            item.ace.setValue(attributes.content);
+                        }
+                        item.ace.gotoLine(1);
+                        setHeight(attributes.height);
+                        item.ace.session.on('change', () => {
+                            setAttributes({ content: item.ace.getValue() });
+                        });
+                    }
+                }
+            }, 50);
         } else {
             window.origami[attributes.hash] = item;
             item.setting = {
