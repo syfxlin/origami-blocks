@@ -117,5 +117,6 @@ export default [
     { value: 102, label: 'XML', ace: 'xml', prism: null },
     { value: 103, label: 'XQuery', ace: 'xquery', prism: null },
     { value: 104, label: 'YAML', ace: 'yaml', prism: null },
-    { value: 105, label: 'Django', ace: 'django', prism: null }
+    { value: 105, label: 'Django', ace: 'django', prism: null },
+    { value: 106, label: 'Bash / Shell', ace: 'text', prism: 'bash' }
 ];
