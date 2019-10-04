@@ -95,11 +95,20 @@ registerBlockType('origami/prism', {
         lang: {
             type: 'string'
         },
+        lineNumbers: {
+            type: 'boolean',
+            default: true
+        },
+        matchBraces: {
+            type: 'boolean',
+            default: true
+        },
         hash: {
             type: 'string'
         },
         height: {
-            type: 'string'
+            type: 'string',
+            default: '30'
         }
     },
     edit: ({ attributes, setAttributes, className }) => {
@@ -232,6 +241,20 @@ registerBlockType('origami/prism', {
                         );
                     }}
                 />
+                <CheckboxControl
+                    label={__('显示行号', 'origami')}
+                    checked={attributes.lineNumbers}
+                    onChange={val => {
+                        setAttributes({ lineNumbers: val });
+                    }}
+                />
+                <CheckboxControl
+                    label={__('匹配括号', 'origami')}
+                    checked={attributes.matchBraces}
+                    onChange={val => {
+                        setAttributes({ matchBraces: val });
+                    }}
+                />
                 <Button
                     isDefault={true}
                     onClick={() => {
@@ -282,7 +305,11 @@ registerBlockType('origami/prism', {
         );
     },
     save: ({ attributes }) => {
-        const className1 = 'line-numbers language-' + attributes.lang;
+        const className1 =
+            (attributes.lineNumbers ? 'line-numbers ' : '') +
+            (attributes.matchBraces ? 'match-braces rainbow-braces ' : '') +
+            'language-' +
+            attributes.lang;
         const className2 = 'language-' + attributes.lang;
         return (
             <div>
