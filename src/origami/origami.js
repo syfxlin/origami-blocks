@@ -686,3 +686,59 @@ registerBlockType('origami/gitcard', {
         );
     }
 });
+
+registerBlockType('origami/articlecard', {
+    title: __('Origami 文章卡片', 'origami'),
+    icon: 'format-aside',
+    category: 'common',
+    keywords: [__('post'), __('card'), __('origami')],
+    attributes: {
+        platform: {
+            type: 'string',
+            default: 'origami'
+        },
+        url: {
+            type: 'string'
+        }
+    },
+    edit: ({ attributes, setAttributes, className }) => {
+        return (
+            <div className={className}>
+                <TextControl
+                    label={__('文章或页面地址', 'origami')}
+                    value={attributes.url}
+                    onChange={val => {
+                        setAttributes({ url: val });
+                    }}
+                />
+                <SelectControl
+                    label={__('选择平台', 'origami')}
+                    value={attributes.platform}
+                    options={[
+                        { label: __('Origami', 'origami'), value: 'origami' },
+                        { label: __('Embed', 'origami'), value: 'embed' }
+                    ]}
+                    onChange={val => {
+                        setAttributes({ platform: val });
+                    }}
+                />
+            </div>
+        );
+    },
+    save: ({ attributes, className }) => {
+        return (
+            <div
+                className={className + ' articlecard'}
+                data-url={attributes.url}
+                data-platform={attributes.platform}
+            >
+                <div className="articlecard-head"></div>
+                <div className="articlecard-body loading"></div>
+                <div className="articlecard-footer">
+                    <div className="articlecard-info"></div>
+                    <div className="articlecard-to"></div>
+                </div>
+            </div>
+        );
+    }
+});
