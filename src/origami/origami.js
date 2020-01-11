@@ -1,68 +1,51 @@
-/* eslint-disable operator-linebreak */
-/* eslint-disable dot-notation */
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-else-return */
-/* eslint-disable computed-property-spacing */
-/* eslint-disable prefer-const */
-/* eslint-disable space-unary-ops */
-/* eslint-disable no-console */
-/* eslint-disable react/jsx-indent-props */
-/* eslint-disable react/jsx-indent */
-/* eslint-disable indent */
-/* eslint-disable react/jsx-curly-spacing */
-/* eslint-disable comma-dangle */
-/* eslint-disable array-bracket-spacing */
-/* eslint-disable space-in-parens */
-/* eslint-disable quotes */
-/* eslint-disable no-unused-vars */
-import './style.scss';
-import './editor.scss';
-import langList from './utils/langList';
-import { toHtml, toMarkdown } from './utils/switchContent';
+import "./style.scss";
+import "./editor.scss";
+import langList from "./utils/langList";
+import { toHtml } from "./utils/switchContent";
 import {
     TextControl,
     SelectControl,
     Button,
     CheckboxControl
-} from '@wordpress/components';
+} from "@wordpress/components";
 
 const { __ } = wp.i18n;
-const { registerBlockType, query } = wp.blocks;
+const { registerBlockType } = wp.blocks;
 
-registerBlockType('origami/notebox', {
-    title: __('Origami Notebox', 'origami'),
-    icon: 'format-aside',
-    category: 'common',
-    keywords: [__('notebox'), __('Notebox'), __('origami')],
+registerBlockType("origami/notebox", {
+    title: __("Origami Notebox", "origami"),
+    icon: "format-aside",
+    category: "common",
+    keywords: [__("notebox"), __("Notebox"), __("origami")],
     attributes: {
         content: {
-            type: 'string',
-            source: 'html',
-            selector: 'p'
+            type: "string",
+            source: "html",
+            selector: "p"
         },
         color_select: {
-            type: 'string'
+            type: "string"
         }
     },
     edit: ({ attributes, setAttributes, className }) => {
         return (
             <div className={className}>
                 <TextControl
-                    label={__('Origami Notebox块', 'origami')}
+                    label={__("Origami Notebox块", "origami")}
                     value={attributes.content}
                     onChange={val => {
                         setAttributes({ content: val });
                     }}
                 />
                 <SelectControl
-                    label={__('选择样式', 'origami')}
+                    label={__("选择样式", "origami")}
                     value={attributes.color_select}
                     options={[
-                        { label: __('请设置颜色', 'origami'), value: null },
-                        { label: __('blue', 'origami'), value: 'blue' },
-                        { label: __('green', 'origami'), value: 'green' },
-                        { label: __('yellow', 'origami'), value: 'yellow' },
-                        { label: __('red', 'origami'), value: 'red' }
+                        { label: __("请设置颜色", "origami"), value: null },
+                        { label: __("blue", "origami"), value: "blue" },
+                        { label: __("green", "origami"), value: "green" },
+                        { label: __("yellow", "origami"), value: "yellow" },
+                        { label: __("red", "origami"), value: "red" }
                     ]}
                     onChange={val => {
                         setAttributes({ color_select: val });
@@ -72,7 +55,7 @@ registerBlockType('origami/notebox', {
         );
     },
     save: ({ attributes }) => {
-        const className = 'message-box ' + attributes.color_select;
+        const className = "message-box " + attributes.color_select;
         return (
             <div>
                 <div className={className}>
@@ -83,36 +66,36 @@ registerBlockType('origami/notebox', {
     }
 });
 
-registerBlockType('origami/prism', {
-    title: __('Origami代码', 'origami'),
-    icon: 'editor-code',
-    category: 'common',
-    keywords: [__('code'), __('prism'), __('origami')],
+registerBlockType("origami/prism", {
+    title: __("Origami代码", "origami"),
+    icon: "editor-code",
+    category: "common",
+    keywords: [__("code"), __("prism"), __("origami")],
     attributes: {
         content: {
-            type: 'string'
+            type: "string"
         },
         lang: {
-            type: 'string'
+            type: "string"
         },
         lineNumbers: {
-            type: 'boolean',
+            type: "boolean",
             default: true
         },
         matchBraces: {
-            type: 'boolean',
+            type: "boolean",
             default: true
         },
         hash: {
-            type: 'string'
+            type: "string"
         },
         height: {
-            type: 'string',
-            default: '30'
+            type: "string",
+            default: "30"
         }
     },
     edit: ({ attributes, setAttributes, className }) => {
-        if (!attributes.hash || attributes.hash === '') {
+        if (!attributes.hash || attributes.hash === "") {
             setAttributes({
                 hash: Math.random()
                     .toString(36)
@@ -122,39 +105,39 @@ registerBlockType('origami/prism', {
         if (!window.origami) {
             window.origami = {};
             window.ace.config.set(
-                'basePath',
-                'https://cdn.jsdelivr.net/npm/ace-builds@1.4.4/src-noconflict/'
+                "basePath",
+                "https://cdn.jsdelivr.net/npm/ace-builds@1.4.4/src-noconflict/"
             );
         }
         let item = {};
         let setHeight = val => {
             if (parseInt(val) > 100) {
-                val = '100';
+                val = "100";
             }
             if (parseInt(val) <= 0) {
-                val = '1';
+                val = "1";
             }
             if (window.origami[attributes.hash].resizeTimer) {
                 clearTimeout(window.origami[attributes.hash].resizeTimer);
             }
             window.origami[attributes.hash].resizeTimer = setTimeout(() => {
                 document.getElementById(
-                    'ace-editor-' + attributes.hash
-                ).style.height = val + 'vh';
+                    "ace-editor-" + attributes.hash
+                ).style.height = val + "vh";
                 window.origami[attributes.hash].ace.resize();
             }, 1000);
         };
         if (window.origami[attributes.hash]) {
             item = window.origami[attributes.hash];
             let timer1 = setInterval(() => {
-                if (document.getElementById('ace-editor-' + attributes.hash)) {
+                if (document.getElementById("ace-editor-" + attributes.hash)) {
                     clearInterval(timer1);
                     if (
-                        document.getElementById('ace-editor-' + attributes.hash)
-                            .innerHTML === ''
+                        document.getElementById("ace-editor-" + attributes.hash)
+                            .innerHTML === ""
                     ) {
                         item.ace = window.ace.edit(
-                            'ace-editor-' + attributes.hash,
+                            "ace-editor-" + attributes.hash,
                             item.setting
                         );
                         if (attributes.content) {
@@ -162,7 +145,7 @@ registerBlockType('origami/prism', {
                         }
                         item.ace.gotoLine(1);
                         setHeight(attributes.height);
-                        item.ace.session.on('change', () => {
+                        item.ace.session.on("change", () => {
                             setAttributes({ content: item.ace.getValue() });
                         });
                     }
@@ -173,12 +156,12 @@ registerBlockType('origami/prism', {
             let listItem = langList.find(
                 o => o.ace === attributes.lang || o.prism === attributes.lang
             );
-            let lang = listItem ? listItem.value : 'clike';
+            let lang = listItem ? listItem.value : "clike";
             item.setting = {
                 minLines: 10,
                 fontSize: 17,
-                theme: 'ace/theme/solarized_light',
-                mode: 'ace/mode/' + lang,
+                theme: "ace/theme/solarized_light",
+                mode: "ace/mode/" + lang,
                 tabSize: 4,
                 wrap: true,
                 enableSnippets: true,
@@ -189,10 +172,10 @@ registerBlockType('origami/prism', {
                 item.ace.commands.commands.showSettingsMenu.exec(item.ace);
             };
             let timer1 = setInterval(() => {
-                if (document.getElementById('ace-editor-' + attributes.hash)) {
+                if (document.getElementById("ace-editor-" + attributes.hash)) {
                     clearInterval(timer1);
                     item.ace = window.ace.edit(
-                        'ace-editor-' + attributes.hash,
+                        "ace-editor-" + attributes.hash,
                         item.setting
                     );
                     if (attributes.content) {
@@ -200,7 +183,7 @@ registerBlockType('origami/prism', {
                     }
                     item.ace.gotoLine(1);
                     setHeight(attributes.height);
-                    item.ace.session.on('change', () => {
+                    item.ace.session.on("change", () => {
                         setAttributes({ content: item.ace.getValue() });
                     });
                 }
@@ -211,10 +194,10 @@ registerBlockType('origami/prism', {
             <div className={className}>
                 <div
                     className="ace-editor"
-                    id={'ace-editor-' + attributes.hash}
+                    id={"ace-editor-" + attributes.hash}
                 />
                 <SelectControl
-                    label={__('代码语言', 'origami')}
+                    label={__("代码语言", "origami")}
                     value={
                         langList.find(
                             o =>
@@ -226,7 +209,7 @@ registerBlockType('origami/prism', {
                                       o.ace === attributes.lang ||
                                       o.prism === attributes.lang
                               ).value
-                            : 'clike'
+                            : "clike"
                     }
                     options={langList}
                     onChange={val => {
@@ -237,19 +220,19 @@ registerBlockType('origami/prism', {
                                     : langList[val].prism
                         });
                         window.origami[attributes.hash].ace.session.setMode(
-                            'ace/mode/' + langList[val].ace
+                            "ace/mode/" + langList[val].ace
                         );
                     }}
                 />
                 <CheckboxControl
-                    label={__('显示行号', 'origami')}
+                    label={__("显示行号", "origami")}
                     checked={attributes.lineNumbers}
                     onChange={val => {
                         setAttributes({ lineNumbers: val });
                     }}
                 />
                 <CheckboxControl
-                    label={__('匹配括号', 'origami')}
+                    label={__("匹配括号", "origami")}
                     checked={attributes.matchBraces}
                     onChange={val => {
                         setAttributes({ matchBraces: val });
@@ -261,37 +244,37 @@ registerBlockType('origami/prism', {
                         item.showSettingMenu();
                     }}
                 >
-                    {__('编辑器菜单', 'origami')}
+                    {__("编辑器菜单", "origami")}
                 </Button>
                 <TextControl
-                    label={__('编辑器高度(延迟一秒生效[1-100])', 'origami')}
+                    label={__("编辑器高度(延迟一秒生效[1-100])", "origami")}
                     value={attributes.height}
                     placeholder="30"
                     onChange={val => {
                         if (parseInt(val) > 100) {
-                            val = '100';
+                            val = "100";
                         }
                         if (parseInt(val) <= 0) {
-                            val = '1';
+                            val = "1";
                         }
                         setHeight(val);
                         setAttributes({ height: val });
                     }}
                     onKeyDown={e => {
-                        if (e.key === 'ArrowDown') {
+                        if (e.key === "ArrowDown") {
                             let val = parseInt(attributes.height) - 1;
                             if (val <= 0) {
-                                val = '1';
+                                val = "1";
                             }
                             setAttributes({
-                                height: val + ''
+                                height: val + ""
                             });
                             setHeight(attributes.height);
                             e.preventDefault();
-                        } else if (e.key === 'ArrowUp') {
+                        } else if (e.key === "ArrowUp") {
                             let val = parseInt(attributes.height) + 1;
                             if (val > 100) {
-                                val = '100';
+                                val = "100";
                             }
                             setAttributes({
                                 height: val
@@ -306,11 +289,11 @@ registerBlockType('origami/prism', {
     },
     save: ({ attributes }) => {
         const className1 =
-            (attributes.lineNumbers ? 'line-numbers ' : '') +
-            (attributes.matchBraces ? 'match-braces rainbow-braces ' : '') +
-            'language-' +
+            (attributes.lineNumbers ? "line-numbers " : "") +
+            (attributes.matchBraces ? "match-braces rainbow-braces " : "") +
+            "language-" +
             attributes.lang;
-        const className2 = 'language-' + attributes.lang;
+        const className2 = "language-" + attributes.lang;
         return (
             <div>
                 <pre className={className1}>
@@ -321,41 +304,41 @@ registerBlockType('origami/prism', {
     }
 });
 
-registerBlockType('origami/image', {
-    title: __('Origami图片', 'origami'),
-    icon: 'format-image',
-    category: 'common',
-    keywords: [__('image'), __('thum'), __('origami')],
+registerBlockType("origami/image", {
+    title: __("Origami图片", "origami"),
+    icon: "format-image",
+    category: "common",
+    keywords: [__("image"), __("thum"), __("origami")],
     attributes: {
         isThum: {
-            type: 'boolean'
+            type: "boolean"
         },
         isShow: {
-            type: 'boolean'
+            type: "boolean"
         },
         url: {
-            type: 'string'
+            type: "string"
         }
     },
     edit: ({ attributes, setAttributes, className }) => {
         return (
             <div className={className}>
                 <CheckboxControl
-                    label={__('是否设置为特色图片', 'origami')}
+                    label={__("是否设置为特色图片", "origami")}
                     checked={attributes.isThum}
                     onChange={val => {
                         setAttributes({ isThum: val });
                     }}
                 />
                 <CheckboxControl
-                    label={__('是否设置为显示', 'origami')}
+                    label={__("是否设置为显示", "origami")}
                     checked={attributes.isShow}
                     onChange={val => {
                         setAttributes({ isShow: val });
                     }}
                 />
                 <TextControl
-                    label={__('图片URL', 'origami')}
+                    label={__("图片URL", "origami")}
                     value={attributes.url}
                     onChange={val => {
                         setAttributes({ url: val });
@@ -365,7 +348,7 @@ registerBlockType('origami/image', {
         );
     },
     save: ({ attributes, className }) => {
-        const styleStr = attributes.isShow ? '' : 'display:none';
+        const styleStr = attributes.isShow ? "" : "display:none";
         return (
             <img
                 className={className}
@@ -378,27 +361,27 @@ registerBlockType('origami/image', {
     }
 });
 
-registerBlockType('origami/markdown', {
-    title: __('Origami Markdown', 'origami'),
-    icon: 'format-aside',
-    category: 'common',
-    keywords: [__('markdown'), __('editor'), __('origami')],
+registerBlockType("origami/markdown", {
+    title: __("Origami Markdown", "origami"),
+    icon: "format-aside",
+    category: "common",
+    keywords: [__("markdown"), __("editor"), __("origami")],
     attributes: {
         content: {
-            type: 'string'
+            type: "string"
         },
         htmlContent: {
-            type: 'string'
+            type: "string"
         },
         hash: {
-            type: 'string'
+            type: "string"
         },
         height: {
-            type: 'string'
+            type: "string"
         }
     },
     edit: ({ attributes, className, setAttributes }) => {
-        if (!attributes.hash || attributes.hash === '') {
+        if (!attributes.hash || attributes.hash === "") {
             setAttributes({
                 hash: Math.random()
                     .toString(36)
@@ -408,39 +391,39 @@ registerBlockType('origami/markdown', {
         if (!window.origami) {
             window.origami = {};
             window.ace.config.set(
-                'basePath',
-                'https://cdn.jsdelivr.net/npm/ace-builds@1.4.4/src-noconflict/'
+                "basePath",
+                "https://cdn.jsdelivr.net/npm/ace-builds@1.4.4/src-noconflict/"
             );
         }
         let item = {};
         let setHeight = val => {
             if (parseInt(val) > 100) {
-                val = '100';
+                val = "100";
             }
             if (parseInt(val) <= 0) {
-                val = '1';
+                val = "1";
             }
             if (window.origami[attributes.hash].resizeTimer) {
                 clearTimeout(window.origami[attributes.hash].resizeTimer);
             }
             window.origami[attributes.hash].resizeTimer = setTimeout(() => {
                 document.getElementById(
-                    'ace-editor-' + attributes.hash
-                ).style.height = val + 'vh';
+                    "ace-editor-" + attributes.hash
+                ).style.height = val + "vh";
                 window.origami[attributes.hash].ace.resize();
             }, 1000);
         };
         if (window.origami[attributes.hash]) {
             item = window.origami[attributes.hash];
             let timer1 = setInterval(() => {
-                if (document.getElementById('ace-editor-' + attributes.hash)) {
+                if (document.getElementById("ace-editor-" + attributes.hash)) {
                     clearInterval(timer1);
                     if (
-                        document.getElementById('ace-editor-' + attributes.hash)
-                            .innerHTML === ''
+                        document.getElementById("ace-editor-" + attributes.hash)
+                            .innerHTML === ""
                     ) {
                         item.ace = window.ace.edit(
-                            'ace-editor-' + attributes.hash,
+                            "ace-editor-" + attributes.hash,
                             item.setting
                         );
                         if (attributes.content) {
@@ -448,7 +431,7 @@ registerBlockType('origami/markdown', {
                         }
                         item.ace.gotoLine(1);
                         setHeight(attributes.height);
-                        item.ace.session.on('change', () => {
+                        item.ace.session.on("change", () => {
                             setAttributes({ content: item.ace.getValue() });
                         });
                     }
@@ -459,8 +442,8 @@ registerBlockType('origami/markdown', {
             item.setting = {
                 minLines: 10,
                 fontSize: 17,
-                theme: 'ace/theme/solarized_light',
-                mode: 'ace/mode/markdown',
+                theme: "ace/theme/solarized_light",
+                mode: "ace/mode/markdown",
                 tabSize: 4,
                 wrap: true,
                 enableSnippets: true,
@@ -471,10 +454,10 @@ registerBlockType('origami/markdown', {
                 item.ace.commands.commands.showSettingsMenu.exec(item.ace);
             };
             let timer = setInterval(() => {
-                if (document.getElementById('ace-editor-' + attributes.hash)) {
+                if (document.getElementById("ace-editor-" + attributes.hash)) {
                     clearInterval(timer);
                     item.ace = window.ace.edit(
-                        'ace-editor-' + attributes.hash,
+                        "ace-editor-" + attributes.hash,
                         item.setting
                     );
                     if (attributes.content) {
@@ -482,7 +465,7 @@ registerBlockType('origami/markdown', {
                     }
                     item.ace.gotoLine(1);
                     setHeight(attributes.height);
-                    item.ace.session.on('change', () => {
+                    item.ace.session.on("change", () => {
                         let val = item.ace.getValue();
                         setAttributes({
                             content: val,
@@ -498,11 +481,11 @@ registerBlockType('origami/markdown', {
             <div className={className}>
                 <div
                     className="ace-editor"
-                    id={'ace-editor-' + attributes.hash}
+                    id={"ace-editor-" + attributes.hash}
                 />
                 <div
                     className="markdown-preview"
-                    id={'markdown-preview-' + attributes.hash}
+                    id={"markdown-preview-" + attributes.hash}
                     dangerouslySetInnerHTML={{
                         __html: attributes.htmlContent
                     }}
@@ -513,97 +496,97 @@ registerBlockType('origami/markdown', {
                         item.showSettingMenu();
                     }}
                 >
-                    {__('编辑器菜单', 'origami')}
+                    {__("编辑器菜单", "origami")}
                 </Button>
                 <Button
                     isDefault={true}
                     onClick={() => {
                         if (!preview) {
                             document.querySelector(
-                                '#markdown-preview-' + attributes.hash
-                            ).style.display = 'block';
+                                "#markdown-preview-" + attributes.hash
+                            ).style.display = "block";
                             document.querySelector(
-                                '#ace-editor-' + attributes.hash
-                            ).style.display = 'none';
+                                "#ace-editor-" + attributes.hash
+                            ).style.display = "none";
                             window.Prism.highlightAll();
                             window.renderMathInElement(
                                 document.querySelector(
-                                    '#markdown-preview-' + attributes.hash
+                                    "#markdown-preview-" + attributes.hash
                                 ),
                                 {
                                     delimiters: [
                                         {
-                                            left: '$$',
-                                            right: '$$'
+                                            left: "$$",
+                                            right: "$$"
                                         },
                                         {
-                                            left: '```math',
-                                            right: '```'
+                                            left: "```math",
+                                            right: "```"
                                         },
                                         {
-                                            left: '```tex',
-                                            right: '```'
+                                            left: "```tex",
+                                            right: "```"
                                         }
                                     ],
                                     ignoredTags: [
-                                        'script',
-                                        'noscript',
-                                        'style',
-                                        'textarea',
-                                        'code'
+                                        "script",
+                                        "noscript",
+                                        "style",
+                                        "textarea",
+                                        "code"
                                     ]
                                 }
                             );
                             try {
                                 window.mermaid.init(
                                     { noteMargin: 10 },
-                                    '.xkeditor-mermaid'
+                                    ".xkeditor-mermaid"
                                 );
                             } catch (error) {
-                                console.log('May have errors');
+                                console.log("May have errors");
                             }
                         } else {
                             document.querySelector(
-                                '#markdown-preview-' + attributes.hash
-                            ).style.display = 'none';
+                                "#markdown-preview-" + attributes.hash
+                            ).style.display = "none";
                             document.querySelector(
-                                '#ace-editor-' + attributes.hash
-                            ).style.display = 'block';
+                                "#ace-editor-" + attributes.hash
+                            ).style.display = "block";
                         }
                         preview = !preview;
                     }}
                 >
-                    {__('预览/编辑', 'origami')}
+                    {__("预览/编辑", "origami")}
                 </Button>
                 <TextControl
-                    label={__('编辑器高度(延迟一秒生效[1-100])', 'origami')}
+                    label={__("编辑器高度(延迟一秒生效[1-100])", "origami")}
                     value={attributes.height}
                     placeholder="30"
                     onChange={val => {
                         if (parseInt(val) > 100) {
-                            val = '100';
+                            val = "100";
                         }
                         if (parseInt(val) <= 0) {
-                            val = '1';
+                            val = "1";
                         }
                         setHeight(val);
                         setAttributes({ height: val });
                     }}
                     onKeyDown={e => {
-                        if (e.key === 'ArrowDown') {
+                        if (e.key === "ArrowDown") {
                             let val = parseInt(attributes.height) - 1;
                             if (val <= 0) {
-                                val = '1';
+                                val = "1";
                             }
                             setAttributes({
-                                height: val + ''
+                                height: val + ""
                             });
                             setHeight(attributes.height);
                             e.preventDefault();
-                        } else if (e.key === 'ArrowUp') {
+                        } else if (e.key === "ArrowUp") {
                             let val = parseInt(attributes.height) + 1;
                             if (val > 100) {
-                                val = '100';
+                                val = "100";
                             }
                             setAttributes({
                                 height: val
@@ -619,7 +602,7 @@ registerBlockType('origami/markdown', {
     save: ({ className, attributes }) => {
         return (
             <div
-                className={'markdown-body ' + className}
+                className={"markdown-body " + className}
                 dangerouslySetInnerHTML={{
                     __html: attributes.htmlContent
                 }}
@@ -628,39 +611,39 @@ registerBlockType('origami/markdown', {
     }
 });
 
-registerBlockType('origami/gitcard', {
-    title: __('Origami Git卡片', 'origami'),
-    icon: 'networking',
-    category: 'common',
-    keywords: [__('git'), __('card'), __('origami')],
+registerBlockType("origami/gitcard", {
+    title: __("Origami Git卡片", "origami"),
+    icon: "networking",
+    category: "common",
+    keywords: [__("git"), __("card"), __("origami")],
     attributes: {
         repo: {
-            type: 'string'
+            type: "string"
         },
         platform: {
-            type: 'string'
+            type: "string"
         }
     },
     edit: ({ attributes, setAttributes, className }) => {
         return (
             <div className={className}>
                 <TextControl
-                    label={__('Git仓库名, ex:(syfxlin/origami)', 'origami')}
+                    label={__("Git仓库名, ex:(syfxlin/origami)", "origami")}
                     value={attributes.repo}
                     onChange={val => {
                         setAttributes({ repo: val });
                     }}
                 />
                 <SelectControl
-                    label={__('选择平台', 'origami')}
+                    label={__("选择平台", "origami")}
                     value={attributes.platform}
                     options={[
-                        { label: __('请选择平台', 'origami'), value: null },
-                        { label: __('GitHub', 'origami'), value: 'github' },
-                        { label: __('GitLab', 'origami'), value: 'gitlab' },
-                        { label: __('Gitea', 'origami'), value: 'gitea' },
-                        { label: __('Coding', 'origami'), value: 'coding' },
-                        { label: __('Gitee', 'origami'), value: 'gitee' }
+                        { label: __("请选择平台", "origami"), value: null },
+                        { label: __("GitHub", "origami"), value: "github" },
+                        { label: __("GitLab", "origami"), value: "gitlab" },
+                        { label: __("Gitea", "origami"), value: "gitea" },
+                        { label: __("Coding", "origami"), value: "coding" },
+                        { label: __("Gitee", "origami"), value: "gitee" }
                     ]}
                     onChange={val => {
                         setAttributes({ platform: val });
@@ -672,7 +655,7 @@ registerBlockType('origami/gitcard', {
     save: ({ attributes, className }) => {
         return (
             <div
-                className={className + ' gitcard'}
+                className={className + " gitcard"}
                 data-repo={attributes.repo}
                 data-platform={attributes.platform}
             >
@@ -687,36 +670,36 @@ registerBlockType('origami/gitcard', {
     }
 });
 
-registerBlockType('origami/articlecard', {
-    title: __('Origami 文章卡片', 'origami'),
-    icon: 'format-aside',
-    category: 'common',
-    keywords: [__('post'), __('card'), __('origami')],
+registerBlockType("origami/articlecard", {
+    title: __("Origami 文章卡片", "origami"),
+    icon: "format-aside",
+    category: "common",
+    keywords: [__("post"), __("card"), __("origami")],
     attributes: {
         platform: {
-            type: 'string',
-            default: 'origami'
+            type: "string",
+            default: "origami"
         },
         url: {
-            type: 'string'
+            type: "string"
         }
     },
     edit: ({ attributes, setAttributes, className }) => {
         return (
             <div className={className}>
                 <TextControl
-                    label={__('文章或页面地址', 'origami')}
+                    label={__("文章或页面地址", "origami")}
                     value={attributes.url}
                     onChange={val => {
                         setAttributes({ url: val });
                     }}
                 />
                 <SelectControl
-                    label={__('选择平台', 'origami')}
+                    label={__("选择平台", "origami")}
                     value={attributes.platform}
                     options={[
-                        { label: __('Origami', 'origami'), value: 'origami' },
-                        { label: __('Embed', 'origami'), value: 'embed' }
+                        { label: __("Origami", "origami"), value: "origami" },
+                        { label: __("Embed", "origami"), value: "embed" }
                     ]}
                     onChange={val => {
                         setAttributes({ platform: val });
@@ -728,7 +711,7 @@ registerBlockType('origami/articlecard', {
     save: ({ attributes, className }) => {
         return (
             <div
-                className={className + ' articlecard'}
+                className={className + " articlecard"}
                 data-url={attributes.url}
                 data-platform={attributes.platform}
             >

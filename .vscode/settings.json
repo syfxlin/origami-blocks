@@ -1,11 +1,10 @@
     {
-    	"eslint.options": {
-    		"configFile": "F:/OtherCode-src/WordPress/wp-content/plugins/my-custom-block/.eslintrc.json",
-    		"plugins": ["html"]
-    	},
-    	"eslint.validate": [
-    		"javascript",
-    		"javascriptreact",
-    		"html"
-    	]
+        "eslint.options": {
+            "plugins": ["html"]
+        },
+        "eslint.validate": [
+            "javascript",
+            "javascriptreact",
+            "html"
+        ]
     }
