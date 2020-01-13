@@ -1,33 +1,12 @@
+/* eslint-disable no-else-return */
+/* eslint-disable no-unused-vars */
+/* eslint-disable quotes */
 /* eslint-disable curly */
 /* eslint-disable eqeqeq */
-/* eslint-disable vars-on-top */
-/* eslint-disable no-var */
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-else-return */
-/* eslint-disable computed-property-spacing */
-/* eslint-disable prefer-const */
-/* eslint-disable space-unary-ops */
-/* eslint-disable no-console */
-/* eslint-disable react/jsx-indent-props */
-/* eslint-disable react/jsx-indent */
-/* eslint-disable indent */
-/* eslint-disable react/jsx-curly-spacing */
-/* eslint-disable comma-dangle */
-/* eslint-disable array-bracket-spacing */
-/* eslint-disable space-in-parens */
-/* eslint-disable quotes */
-/* eslint-disable no-unused-vars */
 import marked from "marked";
 import turndown from "turndown";
 var turndownGfm = require("turndown-plugin-gfm");
-
-// import Prism from "prismjs";
-// import "prismjs/themes/prism-okaidia.css";
-// import "prismjs/plugins/line-numbers/prism-line-numbers.css";
-// import "prismjs/plugins/toolbar/prism-toolbar.css";
-// import "prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.min";
 import EmojiConvertor from "emoji-js";
-
 var emoji = new EmojiConvertor();
 emoji.replace_mode = "unified";
 
@@ -281,6 +260,24 @@ export function toHtml(val, isFull) {
         if (language === "mermaid") {
             return '<pre class="xkeditor-mermaid">' + code + "</pre>";
         }
+        var runExt = "";
+        if (language.indexOf("run-") === 0) {
+            language = language.substring(4);
+            runExt =
+                "<button language=" +
+                language +
+                ' class="run-code-btn">运行</button>' +
+                '<button class="reset-code-btn">重置</button>' +
+                '<button class="input-code-btn">输入</button>' +
+                '<div class="run-code-input"><textarea></textarea></div>' +
+                '<div class="run-code-output"><code></code></div>';
+            if (language === "node") {
+                language = "javascript";
+            }
+            if (language === "python2") {
+                language = "python";
+            }
+        }
         if (isFull) {
             var langTitle =
                 Languages[language] ||
@@ -308,7 +305,8 @@ export function toHtml(val, isFull) {
                     lineNums +
                     '</code></pre><div class="toolbar"><div class="toolbar-item"><a>Copy</a></div><div class="toolbar-item"><span>' +
                     langTitle +
-                    "</span></div></div></div>"
+                    "</span></div></div></div>" +
+                    runExt
                 );
             } else {
                 return (

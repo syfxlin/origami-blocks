@@ -2,11 +2,13 @@ import "./style.scss";
 import "./editor.scss";
 import langList from "./utils/langList";
 import { toHtml } from "./utils/switchContent";
+import runCode from "./utils/runCode";
 import {
     TextControl,
     SelectControl,
     Button,
-    CheckboxControl
+    CheckboxControl,
+    TextareaControl
 } from "@wordpress/components";
 
 const { __ } = wp.i18n;
@@ -92,6 +94,14 @@ registerBlockType("origami/prism", {
         height: {
             type: "string",
             default: "30"
+        },
+        isRun: {
+            type: "boolean",
+            default: false
+        },
+        stdin: {
+            type: "string",
+            default: ""
         }
     },
     edit: ({ attributes, setAttributes, className }) => {
@@ -156,7 +166,7 @@ registerBlockType("origami/prism", {
             let listItem = langList.find(
                 o => o.ace === attributes.lang || o.prism === attributes.lang
             );
-            let lang = listItem ? listItem.value : "clike";
+            let lang = listItem ? listItem.ace : "clike";
             item.setting = {
                 minLines: 10,
                 fontSize: 17,
@@ -190,6 +200,66 @@ registerBlockType("origami/prism", {
             }, 50);
             item.resizeTimer = null;
         }
+        const getSelectValue = () => {
+            return langList.find(
+                o => o.ace === attributes.lang || o.prism === attributes.lang
+            )
+                ? langList.find(
+                      o =>
+                          o.ace === attributes.lang ||
+                          o.prism === attributes.lang
+                  ).value
+                : "clike";
+        };
+        const selectChange = val => {
+            setAttributes({
+                lang:
+                    langList[val].prism === null
+                        ? langList[val].ace
+                        : langList[val].prism
+            });
+            window.origami[attributes.hash].ace.session.setMode(
+                "ace/mode/" + langList[val].ace
+            );
+        };
+        const heightChange = val => {
+            if (parseInt(val) > 100) {
+                val = "100";
+            }
+            if (parseInt(val) <= 0) {
+                val = "1";
+            }
+            setHeight(val);
+            setAttributes({ height: val });
+        };
+        const heightKeyDown = e => {
+            if (e.key === "ArrowDown") {
+                let val = parseInt(attributes.height) - 1;
+                if (val <= 0) {
+                    val = "1";
+                }
+                setAttributes({
+                    height: val + ""
+                });
+                setHeight(attributes.height);
+                e.preventDefault();
+            } else if (e.key === "ArrowUp") {
+                let val = parseInt(attributes.height) + 1;
+                if (val > 100) {
+                    val = "100";
+                }
+                setAttributes({
+                    height: val
+                });
+                setHeight(attributes.height);
+                e.preventDefault();
+            }
+        };
+        const canRun =
+            (window.origamiConfig.judge0API !== "" &&
+                window.origamiConfig.runCodeLangList[attributes.lang] !==
+                    undefined) ||
+            attributes.lang === "javascript";
         return (
             <div className={className}>
                 <div
@@ -198,92 +268,93 @@ registerBlockType("origami/prism", {
                 />
                 <SelectControl
                     label={__("代码语言", "origami")}
-                    value={
-                        langList.find(
-                            o =>
-                                o.ace === attributes.lang ||
-                                o.prism === attributes.lang
-                        )
-                            ? langList.find(
-                                  o =>
-                                      o.ace === attributes.lang ||
-                                      o.prism === attributes.lang
-                              ).value
-                            : "clike"
-                    }
+                    value={getSelectValue()}
                     options={langList}
-                    onChange={val => {
-                        setAttributes({
-                            lang:
-                                langList[val].prism === null
-                                    ? langList[val].ace
-                                    : langList[val].prism
-                        });
-                        window.origami[attributes.hash].ace.session.setMode(
-                            "ace/mode/" + langList[val].ace
-                        );
-                    }}
+                    onChange={val => selectChange(val)}
                 />
                 <CheckboxControl
                     label={__("显示行号", "origami")}
                     checked={attributes.lineNumbers}
-                    onChange={val => {
-                        setAttributes({ lineNumbers: val });
-                    }}
+                    onChange={val => setAttributes({ lineNumbers: val })}
                 />
                 <CheckboxControl
                     label={__("匹配括号", "origami")}
                     checked={attributes.matchBraces}
-                    onChange={val => {
-                        setAttributes({ matchBraces: val });
-                    }}
+                    onChange={val => setAttributes({ matchBraces: val })}
                 />
-                <Button
-                    isDefault={true}
-                    onClick={() => {
-                        item.showSettingMenu();
-                    }}
-                >
+                <CheckboxControl
+                    label={__("启用运行", "origami")}
+                    disabled={!canRun}
+                    checked={canRun && attributes.isRun}
+                    onChange={val => setAttributes({ isRun: val })}
+                />
+                <Button isDefault={true} onClick={() => item.showSettingMenu()}>
                     {__("编辑器菜单", "origami")}
                 </Button>
                 <TextControl
                     label={__("编辑器高度(延迟一秒生效[1-100])", "origami")}
                     value={attributes.height}
                     placeholder="30"
-                    onChange={val => {
-                        if (parseInt(val) > 100) {
-                            val = "100";
-                        }
-                        if (parseInt(val) <= 0) {
-                            val = "1";
-                        }
-                        setHeight(val);
-                        setAttributes({ height: val });
-                    }}
-                    onKeyDown={e => {
-                        if (e.key === "ArrowDown") {
-                            let val = parseInt(attributes.height) - 1;
-                            if (val <= 0) {
-                                val = "1";
-                            }
-                            setAttributes({
-                                height: val + ""
-                            });
-                            setHeight(attributes.height);
-                            e.preventDefault();
-                        } else if (e.key === "ArrowUp") {
-                            let val = parseInt(attributes.height) + 1;
-                            if (val > 100) {
-                                val = "100";
-                            }
-                            setAttributes({
-                                height: val
-                            });
-                            setHeight(attributes.height);
-                            e.preventDefault();
-                        }
-                    }}
+                    onChange={val => heightChange(val)}
+                    onKeyDown={e => heightKeyDown(e)}
                 />
+                {canRun && attributes.isRun && (
+                    <div>
+                        <button
+                            className="run-code-btn"
+                            onClick={e =>
+                                runCode(
+                                    attributes.content,
+                                    attributes.lang,
+                                    attributes.stdin,
+                                    e.target.parentElement.querySelector(
+                                        ".run-code-output code"
+                                    )
+                                )
+                            }
+                        >
+                            运行
+                        </button>
+                        <button
+                            className="reset-code-btn"
+                            onClick={e => {
+                                e.target.parentElement
+                                    .querySelector(
+                                        ".run-code-input .components-base-control"
+                                    )
+                                    .classList.add("r-none");
+                                e.target.parentElement.querySelector(
+                                    ".run-code-output code"
+                                ).innerHTML = "";
+                            }}
+                        >
+                            重置
+                        </button>
+                        <button
+                            className="input-code-btn"
+                            onClick={e => {
+                                e.target.parentElement
+                                    .querySelector(
+                                        ".run-code-input .components-base-control"
+                                    )
+                                    .classList.toggle("r-none");
+                            }}
+                        >
+                            输入
+                        </button>
+                        <div className="run-code-input">
+                            <TextareaControl
+                                className="r-none"
+                                placeholder="输入(stdin)...在此输入的会作为默认输入"
+                                value={attributes.stdin}
+                                onChange={val => setAttributes({ stdin: val })}
+                            />
+                        </div>
+                        <div className="run-code-output">
+                            <code></code>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     },
@@ -294,11 +365,38 @@ registerBlockType("origami/prism", {
             "language-" +
             attributes.lang;
         const className2 = "language-" + attributes.lang;
+        const canRun =
+            (window.origamiConfig.judge0API !== "" &&
+                window.origamiConfig.runCodeLangList[attributes.lang] !==
+                    undefined) ||
+            attributes.lang === "javascript";
         return (
             <div>
                 <pre className={className1}>
                     <code className={className2}>{attributes.content}</code>
                 </pre>
+                {canRun && attributes.isRun && (
+                    <div>
+                        <button
+                            data-lang={attributes.lang}
+                            className="run-code-btn"
+                        >
+                            运行
+                        </button>
+                        <button className="reset-code-btn">重置</button>
+                        <button className="input-code-btn">输入</button>
+                        <div className="run-code-input">
+                            <textarea
+                                placeholder="输入(stdin)..."
+                                className="d-none"
+                                value={attributes.stdin}
+                            ></textarea>
+                        </div>
+                        <div className="run-code-output">
+                            <code></code>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
